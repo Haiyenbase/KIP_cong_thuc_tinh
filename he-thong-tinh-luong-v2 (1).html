@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hệ Thống Tính Lương Kinh Doanh - K.I.P Việt Nam</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --green: #1a6b3c;
+  --green-mid: #2d8653;
+  --green-light: #e6f4ec;
+  --green-pale: #f0f9f4;
+  --amber: #b45309;
+  --amber-bg: #fef3c7;
+  --blue: #1d4ed8;
+  --blue-bg: #eff6ff;
+  --text: #111827;
+  --text-2: #374151;
+  --text-3: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f9fafb;
+  --white: #ffffff;
+  --radius: 10px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+}
+body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.6; }
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(135deg, #1a4731 0%, #2d8653 100%);
+  color:#fff; padding:2.5rem 2rem; text-align:center;
+}
+header h1 { font-size:1.75rem; font-weight:700; letter-spacing:-.01em; margin-bottom:.4rem; }
+header .sub { opacity:.9; font-size:.95rem; }
+header .meta { margin-top:.75rem; font-size:.8rem; opacity:.75; }
+
+/* ── LAYOUT ── */
+.container { max-width:1320px; margin:0 auto; padding:2rem 1.5rem; }
+.section { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:1.75rem; margin-bottom:1.5rem; box-shadow:var(--shadow); }
+.section-title { font-size:1.05rem; font-weight:700; color:var(--green); border-bottom:2px solid var(--green-light); padding-bottom:.6rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:.5rem; }
+
+/* ── GLOSSARY TABLE ── */
+.glossary-wrap { display:grid; grid-template-columns:1fr 1fr; gap:0 1.5rem; }
+.glossary-table { width:100%; border-collapse:collapse; font-size:.83rem; }
+.glossary-table th { background:var(--green); color:#fff; padding:.55rem .85rem; text-align:left; font-weight:600; font-size:.78rem; }
+.glossary-table td { padding:.5rem .85rem; border-bottom:1px solid var(--border); vertical-align:top; }
+.glossary-table tr:last-child td { border-bottom:none; }
+.glossary-table tr:nth-child(even) td { background:#fafafa; }
+.glossary-table td:first-child { font-family:monospace; font-weight:700; color:var(--green); white-space:nowrap; width:70px; }
+
+/* ── FLOW STEPS ── */
+.flow-wrap { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1rem; }
+.flow-card {
+  background:var(--white); border:1.5px solid var(--border); border-radius:var(--radius); padding:1rem 1.1rem;
+  position:relative; transition:border-color .2s, box-shadow .2s;
+}
+.flow-card:hover { border-color:var(--green-mid); box-shadow:0 4px 16px rgba(26,107,60,.12); }
+.flow-num {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%; background:var(--green); color:#fff;
+  font-weight:700; font-size:.8rem; margin-bottom:.6rem;
+}
+.flow-card h4 { font-size:.88rem; font-weight:700; color:var(--green); margin-bottom:.45rem; }
+.flow-card ul { padding-left:1rem; }
+.flow-card li { font-size:.8rem; color:var(--text-2); margin-bottom:.25rem; }
+.flow-card .formula-tag {
+  margin-top:.6rem; background:var(--amber-bg); border-left:3px solid var(--amber);
+  padding:.4rem .7rem; border-radius:4px; font-size:.78rem; font-family:monospace; color:var(--amber);
+}
+.flow-connector { display:none; }
+
+/* ── POSITION GRID ── */
+.pos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.9rem; }
+
+.pos-card {
+  background:var(--white); border:1.5px solid var(--border); border-radius:var(--radius);
+  padding:1rem 1.1rem; cursor:pointer; transition:all .2s; position:relative; overflow:visible;
+}
+.pos-card:hover { border-color:var(--green); box-shadow:0 6px 20px rgba(26,107,60,.14); transform:translateY(-2px); }
+.pos-card .pc-name { font-size:.9rem; font-weight:700; color:var(--text); margin-bottom:.3rem; }
+.pos-card .pc-badge {
+  display:inline-block; background:var(--green-light); color:var(--green);
+  border-radius:20px; padding:.15rem .6rem; font-size:.72rem; font-weight:600; margin-bottom:.5rem;
+}
+.pos-card .pc-formula {
+  background:var(--green-pale); border:1px dashed #a7d7bb; border-radius:6px;
+  padding:.4rem .6rem; font-size:.75rem; font-family:monospace; color:#155534; line-height:1.5;
+}
+
+/* ── TOOLTIP GHI CHÚ ── */
+#tp-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  width: 640px;
+  max-width: calc(100vw - 32px);
+  background: #fffef0;
+  border: 1.5px solid #d4b84a;
+  border-left: 5px solid var(--green);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  box-shadow: 2px 6px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.07);
+  background-image: repeating-linear-gradient(
+    transparent, transparent 23px, #f0e9c8 24px
+  );
+  background-size: 100% 24px;
+}
+#tp-tooltip .tp-title {
+  font-size:.9rem; font-weight:700; color:var(--green);
+  margin-bottom:.6rem; padding-bottom:.4rem;
+  border-bottom:1.5px solid #c6dfc9; line-height:1.4; background:none;
+}
+#tp-tooltip .tp-formula {
+  background:rgba(180,83,9,.08); border-left:3px solid var(--amber);
+  padding:.4rem .7rem; border-radius:5px;
+  font-family:monospace; font-size:.8rem; color:var(--amber);
+  font-weight:700; margin-bottom:.75rem; line-height:1.5;
+}
+#tp-tooltip .tp-section-label {
+  font-size:.72rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.06em; color:var(--green); margin:.75rem 0 .3rem;
+  background:none;
+}
+#tp-tooltip .tp-soft-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:.5rem;
+}
+#tp-tooltip .tp-soft-grid .tp-sub-table { margin:0; }
+#tp-tooltip .tp-sub-label {
+  font-size:.7rem; font-weight:600; color:var(--text-3);
+  margin-bottom:.2rem; padding:.15rem .5rem;
+  background:var(--green-light); border-radius:4px; display:inline-block;
+}
+#tp-tooltip h4 {
+  font-size:.8rem; font-weight:700; color:var(--green);
+  margin:.7rem 0 .3rem; background:none;
+}
+#tp-tooltip table {
+  width:100%; border-collapse:collapse; font-size:.76rem;
+  margin:.25rem 0 .5rem; background:rgba(255,255,255,.75);
+  border-radius:5px; overflow:hidden;
+}
+#tp-tooltip th {
+  background:var(--green); color:#fff;
+  padding:.3rem .6rem; text-align:left; font-size:.71rem;
+}
+#tp-tooltip td {
+  padding:.28rem .6rem; border-bottom:1px solid #e8e0c0;
+  background:rgba(255,255,255,.55);
+}
+#tp-tooltip tr:last-child td { border-bottom:none; }
+#tp-tooltip tr:nth-child(even) td { background:rgba(240,233,200,.4); }
+#tp-tooltip ul { padding-left:1rem; }
+#tp-tooltip li { font-size:.77rem; color:var(--text-2); margin-bottom:.2rem; }
+#tp-tooltip .note {
+  background:rgba(254,243,199,.85); border-left:3px solid var(--amber);
+  padding:.38rem .65rem; border-radius:4px;
+  font-size:.76rem; color:#78350f; margin:.4rem 0;
+}
+#tp-tooltip .note strong { color:var(--amber); }
+
+footer { text-align:center; padding:1.75rem; color:var(--text-3); border-top:1px solid var(--border); font-size:.82rem; margin-top:2rem; background:var(--white); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Hệ Thống Tính Lương Kinh Doanh — K.I.P Việt Nam</h1>
+  <div class="sub">Tháng 01/2026 &nbsp;|&nbsp; Tài liệu tham khảo nội bộ</div>
+  <div class="meta">Cập nhật: Tháng 04/2025 &nbsp;·&nbsp; Liên hệ: Phòng TCHC</div>
+</header>
+
+<div class="container">
+
+<!-- ══ BẢNG THUẬT NGỮ ══ -->
+<div class="section">
+  <div class="section-title">📖 Bảng Thuật Ngữ</div>
+  <div class="glossary-wrap">
+    <table class="glossary-table">
+      <thead><tr><th>Ký hiệu</th><th>Ý nghĩa</th><th>Ghi chú</th></tr></thead>
+      <tbody>
+        <tr><td>CCD</td><td>Công chế độ</td><td>Số công chuẩn trong tháng</td></tr>
+        <tr><td>CTT</td><td>Công thực tế</td><td>Xác định qua TIMESTAMP CAMERA / DMS</td></tr>
+        <tr><td>DSTH</td><td>Doanh số thực hiện</td><td>Doanh số bán ra thực tế trong kỳ</td></tr>
+        <tr><td>DSKH</td><td>Doanh số kế hoạch</td><td>Chỉ tiêu doanh số được giao</td></tr>
+        <tr><td>TL</td><td>Tỷ lệ hoàn thành</td><td>TL = DSTH / DSKH × 100%</td></tr>
+        <tr><td>DTTH</td><td>Doanh thu thực hiện</td><td>Doanh thu tiền về thực tế</td></tr>
+        <tr><td>DTKH</td><td>Doanh thu kế hoạch</td><td>Chỉ tiêu doanh thu được giao</td></tr>
+      </tbody>
+    </table>
+    <table class="glossary-table">
+      <thead><tr><th>Ký hiệu</th><th>Ý nghĩa</th><th>Ghi chú</th></tr></thead>
+      <tbody>
+        <tr><td>LNTH</td><td>Lợi nhuận thực hiện</td><td>% lợi nhuận trên doanh thu</td></tr>
+        <tr><td>TLC</td><td>Tiền lương cứng</td><td>Phần lương cố định theo bậc / theo công</td></tr>
+        <tr><td>TLM</td><td>Tiền lương mềm</td><td>Phần lương biến động theo KQ kinh doanh</td></tr>
+        <tr><td>Ki</td><td>Hệ số kỷ cương</td><td>A = 1.0 &nbsp;|&nbsp; B = 0.9</td></tr>
+        <tr><td>Hki</td><td>Hệ số KPI</td><td>A+=1.2 | A=1.0 | B=0.9 | C=0.8 | D=0.75 | E=0.7</td></tr>
+        <tr><td>NPP</td><td>Nhà phân phối</td><td>Đối tác phân phối của công ty</td></tr>
+        <tr><td>GT</td><td>Giảm trừ</td><td>Khoản trừ khi không đạt ngưỡng tối thiểu</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ LUỒNG TÍNH LƯƠNG ══ -->
+<div class="section">
+  <div class="section-title">🔄 Luồng Tính Lương (7 Bước)</div>
+  <div class="flow-wrap">
+
+    <div class="flow-card">
+      <div class="flow-num">1</div>
+      <h4>Thu thập dữ liệu đầu vào</h4>
+      <ul>
+        <li>Công thực tế (CTT) từ TIMESTAMP CAMERA / DMS</li>
+        <li>Doanh số bán ra từ hệ thống</li>
+        <li>Doanh thu tiền về từ kế toán</li>
+        <li>Hệ số KPI (Hki) từ đánh giá định kỳ</li>
+        <li>Hệ số kỷ cương (Ki) theo quy chế</li>
+      </ul>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-num">2</div>
+      <h4>Tính tỷ lệ hoàn thành (TL)</h4>
+      <ul>
+        <li>TL = DSTH / DSKH × 100%</li>
+        <li>So sánh với các ngưỡng quy định từng vị trí</li>
+        <li>Xác định bậc lương cứng tương ứng</li>
+      </ul>
+      <div class="formula-tag">TL = DSTH ÷ DSKH × 100%</div>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-num">3</div>
+      <h4>Tính lương cứng (TLC)</h4>
+      <ul>
+        <li><strong>Theo công:</strong> TLC = (Mức cứng / CCD) × CTT</li>
+        <li><strong>Theo bậc:</strong> TLC = Mức bậc tương ứng với TL đạt được</li>
+        <li>Áp dụng tùy từng vị trí công việc</li>
+      </ul>
+      <div class="formula-tag">TLC = Mức cứng / CCD × CTT</div>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-num">4</div>
+      <h4>Tính lương mềm (TLM)</h4>
+      <ul>
+        <li>Mềm theo DS NPP nhập / DS bán ra</li>
+        <li>Mềm theo DT tiền về NPP</li>
+        <li>Mềm theo nhóm hàng: TBĐ Vinakip, Ổ dây, SP tập trung</li>
+        <li>Mềm theo % DTTH/DTKH (DA, TMĐT, kênh mới)</li>
+        <li>Mềm duy trì nhân viên bán hàng (SUP TT)</li>
+      </ul>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-num">5</div>
+      <h4>Áp dụng hệ số Ki & Hki</h4>
+      <ul>
+        <li>Ki: Hệ số kỷ cương — A=1.0, B=0.9</li>
+        <li>Hki: Hệ số KPI — A+=1.2 → E=0.7</li>
+        <li>Đánh giá định kỳ theo quy chế công ty</li>
+      </ul>
+      <div class="formula-tag">(TLC + TLM) × Ki × Hki</div>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-num">6</div>
+      <h4>Áp dụng giảm trừ (nếu có)</h4>
+      <ul>
+        <li>SP tập trung ≤ 50%: giảm 8% TLC</li>
+        <li>50% &lt; SP TT ≤ 65%: giảm 6% TLC</li>
+        <li>65% &lt; SP TT ≤ 75%: giảm 4% TLC</li>
+        <li>75% &lt; SP TT &lt; 85%: giảm 2% TLC</li>
+        <li>CBQL: TL &lt; 58.13% → GT = (58.13% − TL) × TLC</li>
+      </ul>
+    </div>
+
+    <div class="flow-card" style="border-color:var(--green); background:var(--green-pale);">
+      <div class="flow-num" style="background:#155534;">7</div>
+      <h4 style="color:#155534;">Tổng lương cuối tháng</h4>
+      <ul>
+        <li>Cộng các khoản phụ cấp (xăng xe, điện thoại, công tác phí)</li>
+        <li>Trừ các khoản giảm trừ theo quy định</li>
+        <li>Áp dụng đầy đủ hệ số Ki và Hki</li>
+      </ul>
+      <div class="formula-tag" style="border-color:#155534; color:#155534; background:#dcf5e7;">Lương = (TLC + ΣTLMềm − GT) × Ki × Hki + PC</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ CÁC VỊ TRÍ ══ -->
+<div class="section">
+  <div class="section-title">💼 Các Vị Trí Kinh Doanh</div>
+  <p style="font-size:.8rem; color:var(--text-3); margin-bottom:1.1rem;">Di chuột vào từng ô để xem chi tiết công thức &amp; bảng lương</p>
+
+  <div class="pos-grid">
+
+    <!-- 1 -->
+    <div class="pos-card" data-id="cbql">
+      <div class="pc-name">1. Cán bộ Quản lý</div>
+      <div class="pc-badge">CBQL</div>
+      <div class="pc-formula">(Cứng<sub>QC</sub>÷CCD×CTT + ΣMềm − GT) × Ki × Hki</div>
+    </div>
+    <div class="tp-data" data-id="cbql" style="display:none">
+      <div class="tp-title">💼 Cán bộ Quản lý (CBQL)</div>
+      <div class="tp-formula">Lương = (Cứng_QC / CCD × CTT + Σ Mềm − Giảm trừ) × Ki × Hki</div>
+      <div class="tp-section-label">Lương cứng</div>
+      <table><tr><th>Công thức</th></tr><tr><td>Cứng TT = (Cứng QC / Công CĐ) × Công TT</td></tr></table>
+      <div class="tp-section-label">Lương mềm — theo từng nhóm</div>
+      <div class="tp-soft-grid">
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">DS NPP nhập</div>
+          <table>
+            <tr><th>TL</th><th>Mức</th></tr>
+            <tr><td>≥ 98.9%</td><td>7.500.000 đ</td></tr>
+            <tr><td>≥ 90%</td><td>5.000.000 đ</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Ổ dây</div>
+          <table>
+            <tr><th>TL</th><th>Mức</th></tr>
+            <tr><td>≥ 80%</td><td>1.000.000 đ</td></tr>
+            <tr><td>≥ 60%</td><td>500.000 đ</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="tp-sub-label">Tiền về NPP (theo vùng) — điều kiện TL ≥ 70%</div>
+      <table>
+        <tr><th>Vùng</th><th>MB1</th><th>MB2</th><th>MB3</th><th>DH</th><th>MT</th><th>MN</th></tr>
+        <tr><td>Mức</td><td>8tr</td><td>5.5tr</td><td>4tr</td><td>3tr</td><td>2tr</td><td>1.5tr</td></tr>
+      </table>
+      <div class="tp-sub-label">Vinakip</div>
+      <div class="note">Theo DSTH/DSKH nhóm hàng TBĐ Vinakip — mức cụ thể theo từng CBQL</div>
+      <div class="tp-section-label">Giảm trừ</div>
+      <div class="note">Nếu TL &lt; 58.13% → Giảm trừ = (58.13% − TL) × Lương cứng</div>
+    </div>
+
+    <!-- 2 -->
+    <div class="pos-card" data-id="suptt">
+      <div class="pc-name">2. Giám sát trực tiếp</div>
+      <div class="pc-badge">SUP TT | QĐ 443</div>
+      <div class="pc-formula">(Cứng<sub>bậc</sub>÷CCD×CTT + ΣMềm − GT) × Ki × Hki</div>
+    </div>
+    <div class="tp-data" data-id="suptt" style="display:none">
+      <div class="tp-title">👁️ Giám sát trực tiếp (SUP TT) — QĐ 443</div>
+      <div class="tp-formula">Lương = (Cứng + Σ Mềm − Giảm trừ) × Ki × Hki</div>
+      <div class="tp-section-label">Lương cứng (6 bậc)</div>
+      <table>
+        <tr><th>Tỷ lệ TL</th><th>Lương cứng</th></tr>
+        <tr><td>TL ≥ 100%</td><td>10.000.000 / CCD × CTT</td></tr>
+        <tr><td>90% ≤ TL &lt; 100%</td><td>9.000.000 / CCD × CTT</td></tr>
+        <tr><td>80% ≤ TL &lt; 90%</td><td>8.000.000 / CCD × CTT</td></tr>
+        <tr><td>60% ≤ TL &lt; 80%</td><td>7.000.000 / CCD × CTT</td></tr>
+        <tr><td>50% ≤ TL &lt; 60%</td><td>5.000.000 / CCD × CTT</td></tr>
+        <tr><td>TL &lt; 50%</td><td>10.000.000 / CCD × CTT × TL</td></tr>
+      </table>
+      <div class="tp-section-label">Lương mềm — theo từng nhóm</div>
+      <div class="tp-soft-grid">
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">DS bán ra</div>
+          <table>
+            <tr><th>TL</th><th>Mức</th></tr>
+            <tr><td>≥ 80%</td><td>4.500.000 đ</td></tr>
+            <tr><td>≥ 60%</td><td>3.000.000 đ</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Vinakip</div>
+          <table>
+            <tr><th>TL</th><th>Mức</th></tr>
+            <tr><td>≥ 80%</td><td>2.300.000 đ</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Ổ dây</div>
+          <table>
+            <tr><th>TL</th><th>Mức</th></tr>
+            <tr><td>≥ 100%</td><td>3.500.000 đ</td></tr>
+            <tr><td>≥ 80%</td><td>2.000.000 đ</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="tp-section-label">Điều kiện & Giảm trừ</div>
+      <div class="note"><strong>Điều kiện:</strong> Tổng DSTH ≥ 65% DSKH &nbsp;|&nbsp; <strong>Giảm trừ:</strong> Khi DSTH &lt; 85% → giảm trừ theo tỷ lệ</div>
+    </div>
+
+    <!-- 3 -->
+    <div class="pos-card" data-id="salesnpp">
+      <div class="pc-name">3. Sales NPP</div>
+      <div class="pc-badge">QĐ 290</div>
+      <div class="pc-formula">Cứng<sub>bậc</sub> × CTT÷CCD + ΣMềm<sub>nhóm hàng</sub></div>
+    </div>
+    <div class="tp-data" data-id="salesnpp" style="display:none">
+      <div class="tp-title">🏪 Sales NPP — QĐ 290</div>
+      <div class="tp-section-label">Lương cứng (4 bậc)</div>
+      <table>
+        <tr><th>Tỷ lệ TL</th><th>Lương cứng</th></tr>
+        <tr><td>TL ≥ 80%</td><td>5.000.000 đ</td></tr>
+        <tr><td>60% ≤ TL &lt; 80%</td><td>4.000.000 đ</td></tr>
+        <tr><td>40% ≤ TL &lt; 60%</td><td>3.000.000 đ</td></tr>
+        <tr><td>TL &lt; 40%</td><td>2.000.000 đ</td></tr>
+      </table>
+      <div class="tp-section-label">Lương mềm — theo từng nhóm hàng</div>
+      <div class="tp-soft-grid">
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">TBĐ KIP</div>
+          <table>
+            <tr><th>TL</th><th>Mức</th></tr>
+            <tr><td>≥ 80%</td><td>1.000.000 đ</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Dây cáp</div>
+          <table>
+            <tr><th>TL</th><th>Mức</th></tr>
+            <tr><td>≥ 150%</td><td>1.500.000 đ</td></tr>
+            <tr><td>100–150%</td><td>1.000.000 đ</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Ổ dây</div>
+          <table>
+            <tr><th>TL</th><th>Mức</th></tr>
+            <tr><td>≥ 80%</td><td>1.200.000 đ</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">OKOM</div>
+          <table>
+            <tr><th colspan="2">Theo bậc tỷ lệ hoàn thành</th></tr>
+          </table>
+        </div>
+      </div>
+      <div class="tp-section-label">Điều kiện</div>
+      <div class="note"><strong>Điều kiện chung:</strong> Tổng DSTH ≥ 65% DSKH</div>
+    </div>
+
+    <!-- 4 -->
+    <div class="pos-card" data-id="gdkd">
+      <div class="pc-name">4. GDKD toàn quốc</div>
+      <div class="pc-badge">QĐ 364</div>
+      <div class="pc-formula">(Cứng<sub>DS≥26tỷ</sub> + Mềm<sub>DT vượt</sub>) × Hki − GT</div>
+    </div>
+    <div class="tp-data" data-id="gdkd" style="display:none">
+      <div class="tp-title">🎯 Giám đốc Kinh doanh toàn quốc — QĐ 364</div>
+      <div class="tp-formula">Lương = (Cứng + Mềm) × Hki − Giảm trừ</div>
+      <h4>🔹 Lương cứng</h4>
+      <table>
+        <tr><th>Điều kiện DSTH</th><th>Lương cứng</th></tr>
+        <tr><td>DSTH ≥ 26 tỷ</td><td>70.000.000 đ</td></tr>
+        <tr><td>DSTH &lt; 26 tỷ</td><td>60.000.000 đ</td></tr>
+      </table>
+      <h4>🔹 Lương mềm</h4>
+      <div class="note">Mềm = 5.000.000 + 0.5% × (DT vượt 31 tỷ)</div>
+      <h4>🔹 Hệ số Hki</h4>
+      <table>
+        <tr><th>A+</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+        <tr><td>1.2</td><td>1.0</td><td>0.9</td><td>0.8</td><td>0.75</td><td>0.7</td></tr>
+      </table>
+      <h4>🔹 Điều kiện & Giảm trừ</h4>
+      <div class="note"><strong>Điều kiện:</strong> LNTH ≥ 5.5%<br><strong>Giảm trừ:</strong> Khi nhóm SP tập trung &lt; 85%</div>
+    </div>
+
+    <!-- 5 -->
+    <div class="pos-card" data-id="tltgd">
+      <div class="pc-name">5. Trợ lý TGĐ</div>
+      <div class="pc-badge">QĐ 464</div>
+      <div class="pc-formula">Cứng<sub>bậc TL</sub> + 2tr + 0.4% × (DT − 31 tỷ)</div>
+    </div>
+    <div class="tp-data" data-id="tltgd" style="display:none">
+      <div class="tp-title">🤝 Trợ lý Tổng Giám đốc — QĐ 464</div>
+      <h4>🔹 Lương cứng (5 bậc)</h4>
+      <table>
+        <tr><th>Tỷ lệ TL</th><th>Lương cứng</th></tr>
+        <tr><td>TL ≥ 100%</td><td>25.500.000 đ</td></tr>
+        <tr><td>90% ≤ TL &lt; 100%</td><td>23.500.000 đ</td></tr>
+        <tr><td>80% ≤ TL &lt; 90%</td><td>21.500.000 đ</td></tr>
+        <tr><td>70% ≤ TL &lt; 80%</td><td>20.000.000 đ</td></tr>
+        <tr><td>TL &lt; 70%</td><td>18.000.000 đ</td></tr>
+      </table>
+      <h4>🔹 Lương mềm</h4>
+      <div class="note">Mềm = 2.000.000 + 0.4% × (DT vượt 31 tỷ)</div>
+      <h4>🔹 Điều kiện</h4>
+      <div class="note"><strong>Lợi nhuận:</strong> LNTH ≥ 5.5% | Hki tương tự GDKD</div>
+    </div>
+
+    <!-- 6 -->
+    <div class="pos-card" data-id="ppkd">
+      <div class="pc-name">6. Phó phòng KD</div>
+      <div class="pc-badge">QĐ 380</div>
+      <div class="pc-formula">Cứng<sub>bậc TL</sub> + 2tr + 0.4% × (DT − 31 tỷ)</div>
+    </div>
+    <div class="tp-data" data-id="ppkd" style="display:none">
+      <div class="tp-title">📋 Phó phòng Kinh doanh — QĐ 380</div>
+      <h4>🔹 Lương cứng (5 bậc)</h4>
+      <table>
+        <tr><th>Tỷ lệ TL</th><th>Lương cứng</th></tr>
+        <tr><td>TL ≥ 100%</td><td>18.000.000 đ</td></tr>
+        <tr><td>90% ≤ TL &lt; 100%</td><td>16.200.000 đ</td></tr>
+        <tr><td>80% ≤ TL &lt; 90%</td><td>15.000.000 đ</td></tr>
+        <tr><td>70% ≤ TL &lt; 80%</td><td>14.000.000 đ</td></tr>
+        <tr><td>TL &lt; 70%</td><td>12.600.000 đ</td></tr>
+      </table>
+      <h4>🔹 Lương mềm & Điều kiện</h4>
+      <div class="note">Mềm = 2.000.000 + 0.4% × (DT vượt 31 tỷ)<br><strong>Điều kiện:</strong> LNTH ≥ 5.5%</div>
+    </div>
+
+    <!-- 7 -->
+    <div class="pos-card" data-id="gdbh">
+      <div class="pc-name">7. GĐBH 6 miền</div>
+      <div class="pc-badge">QĐ 291–203</div>
+      <div class="pc-formula">(Cứng<sub>bậc</sub> + Mềm<sub>DS+TV+nhóm</sub> − GT) × Ki × Hki</div>
+    </div>
+    <div class="tp-data" data-id="gdbh" style="display:none">
+      <div class="tp-title">🌏 Giám đốc Bán hàng 6 miền — QĐ 291/293/298/202/203/201</div>
+      <div class="tp-formula">Lương = (Cứng + Σ Mềm − Giảm trừ) × Ki × Hki</div>
+      <div class="note">6 miền có QĐ riêng với mức lương khác nhau nhưng cấu trúc chung tương tự.</div>
+      <div class="tp-section-label">Lương cứng</div>
+      <div class="note">5 bậc từ ~14tr → ~25tr tùy theo miền và % DSTH/DSKH</div>
+      <div class="tp-section-label">Lương mềm — theo từng nhóm</div>
+      <div class="tp-soft-grid">
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Mềm 1 — DS NPP & NVBH</div>
+          <table><tr><th colspan="2">% DS NPP nhập + DS NVBH trực tiếp</th></tr></table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Mềm 2 — Tiền về</div>
+          <table><tr><th colspan="2">% DT tiền về NPP + NVBH</th></tr></table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">TBĐ Vinakip</div>
+          <table><tr><th colspan="2">Theo tỷ lệ DS nhóm hàng</th></tr></table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Ổ cắm + dây + SP tập trung</div>
+          <table><tr><th colspan="2">Theo tỷ lệ DS nhóm hàng</th></tr></table>
+        </div>
+      </div>
+      <div class="tp-section-label">Điều kiện & Phụ cấp</div>
+      <div class="note"><strong>Điều kiện:</strong> Tổng DSTH ≥ 65% &nbsp;|&nbsp; <strong>Giảm trừ:</strong> SP TT &lt; 85%<br><strong>Phụ cấp:</strong> ĐT 300k + Xăng xe định mức + Công tác phí 550k/ngày</div>
+    </div>
+
+    <!-- 8 -->
+    <div class="pos-card" data-id="nvda">
+      <div class="pc-name">8. NV Dự án</div>
+      <div class="pc-badge">QĐ 644</div>
+      <div class="pc-formula">Cứng<sub>bậc TL</sub> + Mềm<sub>DA+TMĐT+MT mới</sub></div>
+    </div>
+    <div class="tp-data" data-id="nvda" style="display:none">
+      <div class="tp-title">📦 Nhân viên Dự án — QĐ 644</div>
+      <div class="tp-section-label">Lương cứng (5 bậc)</div>
+      <table>
+        <tr><th>Tỷ lệ DSTH/DSKH</th><th>Lương cứng</th></tr>
+        <tr><td>DSTH &lt; 80%</td><td>11.000.000 / CCD × CTT</td></tr>
+        <tr><td>80% ≤ DSTH &lt; 100%</td><td>13.000.000 / CCD × CTT</td></tr>
+        <tr><td>100% ≤ DSTH &lt; 120%</td><td>15.000.000 / CCD × CTT</td></tr>
+        <tr><td>120% ≤ DSTH &lt; 150%</td><td>18.000.000 / CCD × CTT</td></tr>
+        <tr><td>DSTH ≥ 150%</td><td>21.000.000 / CCD × CTT</td></tr>
+      </table>
+      <div class="tp-section-label">Lương mềm — theo từng kênh</div>
+      <div class="tp-soft-grid">
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Kênh Dự án</div>
+          <table>
+            <tr><th>DTTH/DTKH</th><th>Mức</th></tr>
+            <tr><td>&lt; 75%</td><td>0</td></tr>
+            <tr><td>75–100%</td><td>0.1% × DT về</td></tr>
+            <tr><td>≥ 100%</td><td>0.2% × DT về</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">TMĐT (Shopee/Tiktok)</div>
+          <table>
+            <tr><th>DT/tháng</th><th>Mức</th></tr>
+            <tr><td>50tr – 100tr</td><td>1.000.000 đ</td></tr>
+            <tr><td>≥ 100tr</td><td>2.000.000 đ</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Mở mới kênh MT</div>
+          <table>
+            <tr><th>DT tháng đầu</th><th>Mức</th></tr>
+            <tr><td>30tr – 50tr</td><td>3.000.000 đ</td></tr>
+            <tr><td>≥ 50tr</td><td>5.000.000 đ</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="tp-section-label">Phụ cấp</div>
+      <div class="note">Công tác phí: 550k/ngày &nbsp;|&nbsp; Xăng xe + ĐT: 500k/tháng</div>
+    </div>
+
+    <!-- 9 -->
+    <div class="pos-card" data-id="qlda">
+      <div class="pc-name">9. Quản lý Dự án</div>
+      <div class="pc-badge">QĐ 645</div>
+      <div class="pc-formula">Cứng<sub>bậc TL</sub> + Mềm<sub>0.2–0.3% × DT</sub></div>
+    </div>
+    <div class="tp-data" data-id="qlda" style="display:none">
+      <div class="tp-title">👔 Quản lý Dự án — QĐ 645</div>
+      <h4>🔹 Lương cứng (5 bậc)</h4>
+      <table>
+        <tr><th>Tỷ lệ DSTH/DSKH</th><th>Lương cứng</th></tr>
+        <tr><td>DSTH &lt; 80%</td><td>15.000.000 / CCD × CTT</td></tr>
+        <tr><td>80% ≤ DSTH &lt; 100%</td><td>17.000.000 / CCD × CTT</td></tr>
+        <tr><td>100% ≤ DSTH &lt; 120%</td><td>19.000.000 / CCD × CTT</td></tr>
+        <tr><td>120% ≤ DSTH &lt; 150%</td><td>21.000.000 / CCD × CTT</td></tr>
+        <tr><td>DSTH ≥ 150%</td><td>25.000.000 / CCD × CTT</td></tr>
+      </table>
+      <h4>🔹 Lương mềm</h4>
+      <table>
+        <tr><th>Tỷ lệ DTTH/DTKH</th><th>Mức mềm</th></tr>
+        <tr><td>&lt; 75%</td><td>0</td></tr>
+        <tr><td>75% ≤ DTTH &lt; 100%</td><td>0.2% × DT tiền về</td></tr>
+        <tr><td>≥ 100%</td><td>0.3% × DT tiền về</td></tr>
+      </table>
+      <h4>🔹 Phụ cấp</h4>
+      <div class="note">Công tác phí 550k/ngày | Xăng xe + ĐT 500k/tháng | Tiếp khách 2tr/người/tháng</div>
+    </div>
+
+    <!-- 10 -->
+    <div class="pos-card" data-id="nvnvhn">
+      <div class="pc-name">10. NV Nghiệp vụ CN HN</div>
+      <div class="pc-badge">QĐ 16</div>
+      <div class="pc-formula">(7tr + Mềm<sub>DS bán lẻ</sub>) × Hki</div>
+    </div>
+    <div class="tp-data" data-id="nvnvhn" style="display:none">
+      <div class="tp-title">🔧 NV Khối nghiệp vụ CN Hà Nội — QĐ 16</div>
+      <h4>🔹 Lương cứng</h4>
+      <div class="note">Cứng = 7.000.000 đ/tháng (tính theo công)</div>
+      <h4>🔹 Lương mềm theo DS bán lẻ trực tiếp CNHN</h4>
+      <table>
+        <tr><th>Tỷ lệ TL</th><th>TL CN &lt; 80%</th><th>TL CN ≥ 80%</th></tr>
+        <tr><td>85 ≤ TL &lt; 90</td><td>800.000 đ</td><td>1.200.000 đ</td></tr>
+        <tr><td>90 ≤ TL &lt; 100</td><td>1.200.000 đ</td><td>1.500.000 đ</td></tr>
+        <tr><td>100 ≤ TL &lt; 120</td><td>1.500.000 đ</td><td>2.000.000 đ</td></tr>
+      </table>
+      <h4>🔹 Hệ số Hki</h4>
+      <div class="note">A=1.0 | B=0.9 | C=0.8 | D=0.75</div>
+    </div>
+
+    <!-- 12 -->
+    <div class="pos-card" data-id="nvnvmn">
+      <div class="pc-name">11. NV Nghiệp vụ CN MN</div>
+      <div class="pc-badge">QĐ 143</div>
+      <div class="pc-formula">Cứng<sub>chức danh</sub> + Mềm<sub>DS NPP + tiền về</sub></div>
+    </div>
+    <div class="tp-data" data-id="nvnvmn" style="display:none">
+      <div class="tp-title">⚙️ NV Khối nghiệp vụ CN Miền Nam — QĐ 143</div>
+      <div class="tp-section-label">Lương cứng theo chức danh</div>
+      <table>
+        <tr><th>Chức danh</th><th>Lương cứng</th></tr>
+        <tr><td>Kế toán bán hàng</td><td>12.000.000 đ</td></tr>
+        <tr><td>Thủ kho / Phụ kho kiêm lái xe</td><td>9.500.000 đ</td></tr>
+        <tr><td>Phụ kho</td><td>9.000.000 đ</td></tr>
+      </table>
+      <div class="tp-section-label">Lương mềm — theo từng khoản</div>
+      <div class="tp-soft-grid">
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Mềm DS NPP nhập</div>
+          <table>
+            <tr><th>Chức danh</th><th>85–90%</th><th>≥90%</th></tr>
+            <tr><td>Kế toán</td><td>1.000.000</td><td>1.200.000</td></tr>
+            <tr><td>Thủ/phụ kho, lái xe</td><td>900.000</td><td>1.000.000</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Mềm DS tiền về NPP</div>
+          <table>
+            <tr><th>Chức danh</th><th>85–90%</th><th>≥90%</th></tr>
+            <tr><td>Kế toán</td><td>1.500.000</td><td>1.800.000</td></tr>
+            <tr><td>Thủ/phụ kho, lái xe</td><td>1.200.000</td><td>1.500.000</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="tp-section-label">Tăng lương (03/2025)</div>
+      <div class="note">Tâm 10→12tr &nbsp;|&nbsp; Thành 8.5→10tr &nbsp;|&nbsp; Du 8→9tr</div>
+    </div>
+
+    <!-- 13 -->
+    <div class="pos-card" data-id="gsnpp">
+      <div class="pc-name">12. Giám sát NPP</div>
+      <div class="pc-badge">QĐ 64</div>
+      <div class="pc-formula">10tr + Mềm<sub>DS bán lẻ CNHN</sub> × Hki</div>
+    </div>
+    <div class="tp-data" data-id="gsnpp" style="display:none">
+      <div class="tp-title">👁️ Giám sát NPP — QĐ 64</div>
+      <h4>🔹 Lương cứng</h4>
+      <div class="note">Cứng = 10.000.000 đ/tháng (tính theo công)</div>
+      <h4>🔹 Lương mềm (CHỈ GSBH CNHN)</h4>
+      <table>
+        <tr><th>Tỷ lệ TL</th><th>Mức mềm</th></tr>
+        <tr><td>TL &lt; 85%</td><td>0</td></tr>
+        <tr><td>85 ≤ TL &lt; 90</td><td>800.000 → 1.200.000 đ</td></tr>
+        <tr><td>90 ≤ TL &lt; 100</td><td>1.200.000 → 1.500.000 đ</td></tr>
+        <tr><td>100 ≤ TL &lt; 120</td><td>1.500.000 → 2.000.000 đ</td></tr>
+        <tr><td>TL ≥ 120%</td><td>2.000.000 đ</td></tr>
+      </table>
+      <h4>🔹 Hệ số Hki</h4>
+      <div class="note">A=1.0 | B=0.9 | C=0.8 | D=0.75</div>
+    </div>
+
+    <!-- 14 -->
+    <div class="pos-card" data-id="gstt">
+      <div class="pc-name">13. Giám sát trực tiếp</div>
+      <div class="pc-badge">QĐ 204</div>
+      <div class="pc-formula">Cứng<sub>TL</sub> + Mềm<sub>1+2+3</sub> − GT<sub>SP&lt;85%</sub></div>
+    </div>
+    <div class="tp-data" data-id="gstt" style="display:none">
+      <div class="tp-title">👀 Giám sát trực tiếp — QĐ 204</div>
+      <div class="tp-formula">Lương = (Cứng + Σ Mềm − Giảm trừ) × Ki × Hki</div>
+      <div class="tp-section-label">Lương cứng</div>
+      <div class="note">Theo công &amp; tỷ lệ TL (50%–100% mức cứng quy định)</div>
+      <div class="tp-section-label">Lương mềm — theo từng khoản</div>
+      <div class="tp-soft-grid">
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Mềm 1 — DS tổng</div>
+          <table><tr><th colspan="2">0.6% × (DS GSBH + DS Sales)</th></tr></table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Mềm 2 — Nhóm hàng (85–120%)</div>
+          <table>
+            <tr><th>Nhóm</th><th>Mức</th></tr>
+            <tr><td>TBĐ Vinakip</td><td>1.8tr – 3.5tr đ</td></tr>
+            <tr><td>Ổ dây</td><td>1.8tr – 3.5tr đ</td></tr>
+            <tr><td>SP tập trung</td><td>1.8tr – 3.5tr đ</td></tr>
+          </table>
+        </div>
+        <div class="tp-sub-table">
+          <div class="tp-sub-label">Mềm 3 — Duy trì NV</div>
+          <table>
+            <tr><th>DSTH</th><th>NV &lt;80%</th><th>NV ≥80%</th></tr>
+            <tr><td>85–95%</td><td>700k</td><td>1.000k</td></tr>
+            <tr><td>95–100%</td><td>1.000k</td><td>1.500k</td></tr>
+            <tr><td>≥100%</td><td>1.500k</td><td>2.000k</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="tp-section-label">Điều kiện & Giảm trừ</div>
+      <div class="note"><strong>Điều kiện:</strong> %DS Sales bán ra ≥ 65%<br><strong>Giảm trừ:</strong> SP TT &lt; 85% → 2–8% TLC &nbsp;|&nbsp; <strong>Phụ cấp:</strong> 450k/ngày (≤12 ngày) + Xăng xe 500k/tháng</div>
+    </div>
+
+    <!-- 15 -->
+    <div class="pos-card" data-id="pcky">
+      <div class="pc-name">14. Phụ cấp kiêm nhiệm</div>
+      <div class="pc-badge">Tạ Quang Kỳ | QĐ 210/53</div>
+      <div class="pc-formula">3tr cố định + PC<sub>bậc TL</sub> (1–4tr)</div>
+    </div>
+    <div class="tp-data" data-id="pcky" style="display:none">
+      <div class="tp-title">💼 Phụ cấp kiêm nhiệm — Ông Tạ Quang Kỳ</div>
+      <div class="note"><strong>Vị trí:</strong> GSBH trực tiếp kiêm hỗ trợ GDCN miền Bắc điều phối khu vực Hà Nội<br><strong>Áp dụng từ:</strong> 20/04/2024 | Điều chỉnh TL từ 01/2026 (TB 53)</div>
+      <h4>🔹 Phụ cấp cố định</h4>
+      <div class="note">3.000.000 đ/tháng</div>
+      <h4>🔹 Phụ cấp theo doanh số</h4>
+      <table>
+        <tr><th>Tỷ lệ DSTH/DSKH</th><th>Phụ cấp</th></tr>
+        <tr><td>70% – 80%</td><td>1.000.000 đ</td></tr>
+        <tr><td>80% – 90%</td><td>2.000.000 đ</td></tr>
+        <tr><td>90% – 100%</td><td>3.000.000 đ</td></tr>
+        <tr><td>≥ 100%</td><td>4.000.000 đ (theo TB 53/2026)</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  <strong>Tài liệu tham khảo nội bộ</strong> — Công ty CP K.I.P Việt Nam<br>
+  📞 Liên hệ: Phòng TCHC &nbsp;|&nbsp; ✉️ hr@kip.vn &nbsp;|&nbsp; Cập nhật đến tháng 04/2025
+</footer>
+
+<!-- Tooltip ghi chú -->
+<div id="tp-tooltip"></div>
+
+<script>
+  const tip = document.getElementById('tp-tooltip');
+  let hideTimer = null;
+
+  function cancelHide() {
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+  }
+
+  function scheduleHide() {
+    cancelHide();
+    hideTimer = setTimeout(() => { tip.style.display = 'none'; }, 150);
+  }
+
+  function positionTip(e) {
+    const pad = 16;
+    const tw = tip.offsetWidth || 380;
+    const th = tip.offsetHeight || 300;
+    let x = e.clientX + 20;
+    let y = e.clientY + 14;
+    if (x + tw + pad > window.innerWidth)  x = e.clientX - tw - 12;
+    if (y + th + pad > window.innerHeight) y = e.clientY - th - 12;
+    if (x < pad) x = pad;
+    if (y < pad) y = pad;
+    tip.style.left = x + 'px';
+    tip.style.top  = y + 'px';
+  }
+
+  function showTip(id, e) {
+    cancelHide();
+    const src = document.querySelector('.tp-data[data-id="' + id + '"]');
+    if (!src) return;
+    tip.innerHTML = src.innerHTML;
+    tip.style.display = 'block';
+    positionTip(e);
+  }
+
+  document.querySelectorAll('.pos-card').forEach(card => {
+    card.addEventListener('mouseenter', e => showTip(card.dataset.id, e));
+    card.addEventListener('mousemove',  e => positionTip(e));
+    card.addEventListener('mouseleave', scheduleHide);
+  });
+
+  tip.addEventListener('mouseenter', cancelHide);
+  tip.addEventListener('mouseleave', scheduleHide);
+</script>
+</body>
+</html>
